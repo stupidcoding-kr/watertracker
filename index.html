@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Water Tracker - Smart Date Edition</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 10px;
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: transparent;
+      display: flex; justify-content: center; align-items: center; min-height: 100vh;
+      user-select: none;
+    }
+    .widget-card {
+      width: 240px; padding: 18px 16px 14px;
+      background: #ffffff; border: 1px solid #f1f5f9; border-radius: 22px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      position: relative;
+    }
+    .title { font-size: 16px; font-weight: 700; color: #0f172a; letter-spacing: -0.3px; margin-bottom: 6px; }
+    
+    /* 날짜 내비게이션 영역 */
+    .date-nav {
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      margin-bottom: 10px; position: relative; width: 100%;
+    }
+    .nav-arrow-btn {
+      border: none; background: transparent; color: #94a3b8; font-size: 12px; font-weight: 800;
+      cursor: pointer; padding: 2px 6px; border-radius: 6px; transition: all 0.15s;
+    }
+    .nav-arrow-btn:hover { background: #f1f5f9; color: #0f172a; }
+
+    .date-badge {
+      font-size: 11px; font-weight: 600; color: #0284c7; background-color: #f0f9ff;
+      padding: 3px 10px; border-radius: 16px; display: inline-block; cursor: pointer;
+      border: 1px solid #bae6fd; transition: all 0.2s;
+    }
+    .date-badge:hover { background-color: #e0f2fe; }
+
+    /* 달력 팝업 */
+    .calendar-popup {
+      display: none;
+      position: absolute; top: 28px; left: 50%; transform: translateX(-50%);
+      width: 210px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px;
+      padding: 10px 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); z-index: 50;
+    }
+    .calendar-popup.show { display: block; }
+
+    .cal-header-nav {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 0 4px;
+    }
+    .cal-nav-btn {
+      border: none; background: transparent; color: #64748b; font-size: 11px; font-weight: 800;
+      cursor: pointer; padding: 2px 6px; border-radius: 4px;
+    }
+    .cal-nav-btn:hover { background: #f1f5f9; color: #0f172a; }
+    .cal-month-title { font-size: 11px; font-weight: 700; color: #1e293b; }
+
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; align-items: center; justify-items: center;
+    }
+    .cal-day-label {
+      font-size: 9px; color: #94a3b8; font-weight: 600; text-align: center; margin-bottom: 4px; width: 100%;
+    }
+    .cal-day-label.sun { color: #ef4444; }
+    .cal-day-label.sat { color: #3b82f6; }
+
+    .cal-date {
+      width: 100%; aspect-ratio: 1 / 1; font-size: 10px; font-weight: 600; color: #64748b;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      background: transparent; border: none; border-radius: 6px;
+    }
+    .cal-date:hover { background-color: #f1f5f9; }
+    .cal-date.selected-day { background-color: #0284c7; color: #ffffff; font-weight: 700; }
+    .cal-date.sun-day { color: #ef4444; }
+    .cal-date.sat-day { color: #3b82f6; }
+    .cal-date.selected-day.sun-day, .cal-date.selected-day.sat-day { color: #ffffff; }
+
+    .bottle-container {
+      position: relative; width: 85px; height: 162px; cursor: pointer; margin-bottom: 8px;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .bottle-container:hover { transform: scale(1.03); }
+    .bottle-container:active { transform: scale(0.97); }
+
+    .subtitle { font-size: 13px; font-weight: 700; color: #0284c7; margin-bottom: 12px; }
+    .subtitle span.max { color: #94a3b8; font-weight: 500; font-size: 11px; }
+
+    .quick-btns { 
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; margin-bottom: 8px;
+    }
+    .btn {
+      border: none; background-color: #f8fafc; color: #475569; padding: 7px 0;
+      border-radius: 10px; font-size: 11px; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all 0.2s ease; border: 1px solid #e2e8f0;
+    }
+    .btn:hover { background-color: #f1f5f9; color: #0f172a; border-color: #cbd5e1; }
+    .btn-main { background-color: #f0f9ff; color: #0284c7; border-color: #e0f2fe; }
+    .btn-main:hover { background-color: #e0f2fe; border-color: #bae6fd; }
+
+    .input-box { display: flex; gap: 6px; width: 100%; align-items: center; margin-bottom: 10px; }
+    .input-wrapper { position: relative; flex: 1; display: flex; align-items: center; }
+    .input-wrapper input {
+      width: 100%; padding: 6px 24px 6px 8px; border: 1px solid #e2e8f0; border-radius: 10px;
+      font-size: 11px; font-family: inherit; text-align: right; outline: none; transition: border-color 0.2s;
+      background-color: #f8fafc; color: #1e293b;
+    }
+    .input-wrapper input:focus { border-color: #7dd3fc; background-color: #ffffff; }
+    .input-wrapper .unit { position: absolute; right: 7px; font-size: 10px; font-weight: 600; color: #94a3b8; }
+
+    .action-btn {
+      border: none; padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s ease; font-family: inherit; white-space: nowrap;
+      background-color: #7dd3fc; color: #0f172a; box-shadow: 0 2px 5px rgba(125, 211, 252, 0.4);
+    }
+    .action-btn:hover { background-color: #38bdf8; color: #ffffff; }
+
+    .footer-tools { display: flex; align-items: center; justify-content: center; }
+    .reset-btn { border: none; background: transparent; color: #94a3b8; font-size: 10px; cursor: pointer; text-decoration: underline; transition: color 0.2s; }
+    .reset-btn:hover { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="widget-card">
+    <div class="title">Water Tracker</div>
+    
+    <!-- 날짜 선택 영역 -->
+    <div class="date-nav">
+      <button class="nav-arrow-btn" onclick="changeDate(-1)">&lt;</button>
+      <div class="date-badge" id="dateDisplay" onclick="toggleCalendarPopup(event)">2026.00.00 (월)</div>
+      <button class="nav-arrow-btn" onclick="changeDate(1)">&gt;</button>
+
+      <!-- 팝업 달력 -->
+      <div class="calendar-popup" id="calendarPopup" onclick="event.stopPropagation()">
+        <div class="cal-header-nav">
+          <button class="cal-nav-btn" onclick="changeCalMonth(-1)">&lt;</button>
+          <div class="cal-month-title" id="calMonthTitle">2026.09</div>
+          <button class="cal-nav-btn" onclick="changeCalMonth(1)">&gt;</button>
+        </div>
+        <div class="cal-grid" id="calGrid">
+          <div class="cal-day-label sun">일</div>
+          <div class="cal-day-label">월</div>
+          <div class="cal-day-label">화</div>
+          <div class="cal-day-label">수</div>
+          <div class="cal-day-label">목</div>
+          <div class="cal-day-label">금</div>
+          <div class="cal-day-label sat">토</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 물병 그래픽 -->
+    <div class="bottle-container" onclick="addWater(500)">
+      <svg width="85" height="162" viewBox="0 0 110 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="bottleClip">
+            <path d="M44 28 C44 33 22 42 22 62 V192 C22 200 28 206 36 206 H74 C82 206 88 200 88 192 V62 C88 42 66 33 66 28 Z" />
+          </clipPath>
+          <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#bae6fd" />
+            <stop offset="100%" stop-color="#7dd3fc" />
+          </linearGradient>
+          <linearGradient id="glassShine" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8" />
+            <stop offset="25%" stop-color="#ffffff" stop-opacity="0.15" />
+            <stop offset="80%" stop-color="#ffffff" stop-opacity="0.05" />
+            <stop offset="100%" stop-color="#bae6fd" stop-opacity="0.3" />
+          </linearGradient>
+        </defs>
+        <rect x="42" y="6" width="26" height="18" rx="5" fill="#7dd3fc" />
+        <rect x="40" y="24" width="30" height="4" rx="1" fill="#38bdf8" />
+        <path d="M44 28 C44 33 22 42 22 62 V192 C22 200 28 206 36 206 H74 C82 206 88 200 88 192 V62 C88 42 66 33 66 28 Z" 
+              fill="url(#glassShine)" stroke="#bae6fd" stroke-width="1.8" />
+        <g clip-path="url(#bottleClip)">
+          <rect id="liquid" x="0" y="206" width="110" height="0" fill="url(#waterGrad)" style="transition: all 0.4s ease-in-out;" />
+          <ellipse id="liquidSurface" cx="55" cy="206" rx="55" ry="3" fill="#e0f2fe" style="transition: all 0.4s ease-in-out; opacity: 0;" />
+        </g>
+        <path d="M27 64 V190" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.75" />
+        <path d="M31 60 V194" stroke="#ffffff" stroke-width="1" stroke-linecap="round" opacity="0.35" />
+        <line x1="88" y1="168" x2="94" y2="168" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
+        <text x="97" y="171" font-size="8" font-weight="600" fill="#94a3b8" font-family="Pretendard">500</text>
+        <line x1="88" y1="130" x2="94" y2="130" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
+        <text x="97" y="133" font-size="8" font-weight="600" fill="#94a3b8" font-family="Pretendard">1L</text>
+        <line x1="88" y1="92" x2="94" y2="92" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
+        <text x="97" y="95" font-size="8" font-weight="600" fill="#94a3b8" font-family="Pretendard">1.5L</text>
+      </svg>
+    </div>
+
+    <div class="subtitle"><span id="currentMl">0</span> <span class="max">/ 2,000 ml (<span id="percent">0</span>%)</span></div>
+
+    <div class="quick-btns">
+      <button class="btn" onclick="addWater(50)">+50ml</button>
+      <button class="btn btn-main" onclick="addWater(200)">+200ml</button>
+      <button class="btn" onclick="addWater(500)">+500ml</button>
+    </div>
+
+    <div class="input-box">
+      <div class="input-wrapper">
+        <input type="text" id="customInput" placeholder="예: +200, -100, 1500">
+        <span class="unit">ml</span>
+      </div>
+      <button class="action-btn" onclick="handleCustomInput()">입력</button>
+    </div>
+
+    <div class="footer-tools">
+      <button class="reset-btn" onclick="resetWater()">리셋</button>
+    </div>
+  </div>
+
+  <script>
+    const GOAL_ML = 2000;
+    let selectedDate = new Date();
+    let viewYear = selectedDate.getFullYear();
+    let viewMonth = selectedDate.getMonth();
+
+    let currentMl = 0;
+    let hasCelebrated = false;
+
+    const BOTTOM_Y = 206, TOP_Y = 52, TOTAL_HEIGHT = BOTTOM_Y - TOP_Y;
+
+    function getFormattedDate(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function getDisplayDateString(dateObj) {
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      const dayName = days[dateObj.getDay()];
+      return `${y}.${m}.${d} (${dayName})`;
+    }
+
+    async function loadWaterData(dateStr) {
+      try {
+        const res = await fetch(`/api/notion?date=${dateStr}`);
+        const data = await res.json();
+        if (data.success) {
+          return data.amount || 0;
+        }
+      } catch (e) {
+        console.error("데이터 로드 실패:", e);
+      }
+      return parseInt(localStorage.getItem(`water_tracker_${dateStr}`)) || 0;
+    }
+
+    async function saveWaterData(dateStr, amount) {
+      localStorage.setItem(`water_tracker_${dateStr}`, amount);
+      await sendToNotion(dateStr, amount);
+    }
+
+    function changeDate(offset) {
+      selectedDate.setDate(selectedDate.getDate() + offset);
+      viewYear = selectedDate.getFullYear();
+      viewMonth = selectedDate.getMonth();
+      loadAndRenderCurrentDate();
+    }
+
+    async function loadAndRenderCurrentDate() {
+      const dateStr = getFormattedDate(selectedDate);
+      document.getElementById('dateDisplay').innerText = getDisplayDateString(selectedDate);
+
+      currentMl = await loadWaterData(dateStr);
+      hasCelebrated = currentMl >= GOAL_ML;
+
+      updateWidget(false);
+      renderCalendar();
+    }
+
+    function toggleCalendarPopup(e) {
+      if (e) e.stopPropagation();
+      const popup = document.getElementById('calendarPopup');
+      popup.classList.toggle('show');
+      if (popup.classList.contains('show')) {
+        renderCalendar();
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      const popup = document.getElementById('calendarPopup');
+      if (popup && !popup.contains(e.target) && !e.target.closest('#dateDisplay')) {
+        popup.classList.remove('show');
+      }
+    });
+
+    function changeCalMonth(delta) {
+      viewMonth += delta;
+      if (viewMonth < 0) {
+        viewMonth = 11;
+        viewYear--;
+      } else if (viewMonth > 11) {
+        viewMonth = 0;
+        viewYear++;
+      }
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const calGrid = document.getElementById('calGrid');
+      const calMonthTitle = document.getElementById('calMonthTitle');
+
+      calMonthTitle.innerText = `${viewYear}.${String(viewMonth + 1).padStart(2, '0')}`;
+
+      const labels = calGrid.querySelectorAll('.cal-day-label');
+      calGrid.innerHTML = '';
+      labels.forEach(l => calGrid.appendChild(l));
+
+      const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+      const totalDays = new Date(viewYear, viewMonth + 1, 0).getDate();
+      const selectedStr = getFormattedDate(selectedDate);
+
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'cal-date';
+        empty.style.cursor = 'default';
+        calGrid.appendChild(empty);
+      }
+
+      for (let d = 1; d <= totalDays; d++) {
+        const dayOfWeek = (firstDay + d - 1) % 7;
+        const dateEl = document.createElement('div');
+        dateEl.className = 'cal-date';
+
+        const thisDateObj = new Date(viewYear, viewMonth, d);
+        const thisDateStr = getFormattedDate(thisDateObj);
+
+        if (dayOfWeek === 0) dateEl.classList.add('sun-day');
+        if (dayOfWeek === 6) dateEl.classList.add('sat-day');
+
+        if (thisDateStr === selectedStr) {
+          dateEl.classList.add('selected-day');
+        }
+
+        dateEl.innerText = d;
+
+        dateEl.onclick = (e) => {
+          e.stopPropagation();
+          selectedDate = thisDateObj;
+          document.getElementById('calendarPopup').classList.remove('show');
+          loadAndRenderCurrentDate();
+        };
+
+        calGrid.appendChild(dateEl);
+      }
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 70,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ['#7dd3fc', '#38bdf8', '#0284c7', '#bae6fd', '#fcd34d']
+        });
+      }
+    }
+
+    function updateWidget(shouldSave = true) {
+      if (currentMl < 0) currentMl = 0;
+
+      if (currentMl >= GOAL_ML && !hasCelebrated) {
+        hasCelebrated = true;
+        triggerConfetti();
+      } else if (currentMl < GOAL_ML) {
+        hasCelebrated = false;
+      }
+
+      document.getElementById('currentMl').innerText = currentMl.toLocaleString();
+      document.getElementById('percent').innerText = Math.round((currentMl / GOAL_ML) * 100);
+
+      const fillRatio = Math.min(1, currentMl / GOAL_ML);
+      const fillHeight = fillRatio * TOTAL_HEIGHT;
+      const targetY = BOTTOM_Y - fillHeight;
+
+      const liquid = document.getElementById('liquid');
+      const surface = document.getElementById('liquidSurface');
+
+      liquid.setAttribute('y', targetY);
+      liquid.setAttribute('height', fillHeight);
+      surface.setAttribute('cy', targetY);
+      surface.style.opacity = currentMl > 0 ? "1" : "0";
+
+      if (shouldSave) {
+        saveWaterData(getFormattedDate(selectedDate), currentMl);
+      }
+    }
+
+    function addWater(amount) {
+      currentMl += amount;
+      updateWidget(true);
+    }
+
+    function handleCustomInput() {
+      const inputEl = document.getElementById('customInput');
+      const str = inputEl.value.trim();
+      if (!str) return;
+
+      if (str.startsWith('+')) {
+        const val = parseInt(str.slice(1), 10);
+        if (!isNaN(val)) addWater(val);
+      } else if (str.startsWith('-')) {
+        const val = parseInt(str.slice(1), 10);
+        if (!isNaN(val)) addWater(-val);
+      } else {
+        const val = parseInt(str, 10);
+        if (!isNaN(val) && val >= 0) {
+          currentMl = val;
+          updateWidget(true);
+        }
+      }
+      inputEl.value = '';
+    }
+
+    function resetWater() {
+      currentMl = 0;
+      hasCelebrated = false;
+      updateWidget(true);
+    }
+
+    async function sendToNotion(dateStr, amount) {
+      try {
+        await fetch('/api/notion', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date: dateStr, amount: amount })
+        });
+      } catch (e) {
+        console.error("Notion 저장 실패:", e);
+      }
+    }
+
+    document.getElementById('customInput').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') handleCustomInput();
+    });
+
+    loadAndRenderCurrentDate();
+  </script>
+</body>
+</html>
