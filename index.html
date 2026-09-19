@@ -21,7 +21,8 @@
       display: flex; flex-direction: column; align-items: center; text-align: center;
       position: relative;
     }
-    .title { font-size: 16px; font-weight: 700; color: #0f172a; letter-spacing: -0.3px; margin-bottom: 6px; }
+    /* Water Tracker 타이틀: 부드러운 검정색(#2b2b2b) 및 자간(letter-spacing) 넓힘 */
+    .title { font-size: 16px; font-weight: 700; color: #2b2b2b; letter-spacing: 2px; margin-bottom: 6px; }
     
     /* 날짜 내비게이션 영역 */
     .date-nav {
@@ -34,12 +35,13 @@
     }
     .nav-arrow-btn:hover { background: #f1f5f9; color: #0f172a; }
 
+    /* 날짜 표시 칸: 연한 회색 배경(#f1f5f9) 및 진한 회색 글자(#475569) */
     .date-badge {
-      font-size: 11px; font-weight: 600; color: #0284c7; background-color: #f0f9ff;
+      font-size: 11px; font-weight: 600; color: #475569; background-color: #f1f5f9;
       padding: 3px 10px; border-radius: 16px; display: inline-block; cursor: pointer;
-      border: 1px solid #bae6fd; transition: all 0.2s;
+      border: 1px solid #cbd5e1; transition: all 0.2s;
     }
-    .date-badge:hover { background-color: #e0f2fe; }
+    .date-badge:hover { background-color: #e2e8f0; }
 
     /* 달력 팝업 */
     .calendar-popup {
@@ -112,12 +114,13 @@
     .input-wrapper input:focus { border-color: #7dd3fc; background-color: #ffffff; }
     .input-wrapper .unit { position: absolute; right: 7px; font-size: 10px; font-weight: 600; color: #94a3b8; }
 
+    /* 입력 버튼: 파스텔 연하늘색(#bae6fd) 배경 및 연회색(#94a3b8) 글자 */
     .action-btn {
       border: none; padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 600;
       cursor: pointer; transition: all 0.15s ease; font-family: inherit; white-space: nowrap;
-      background-color: #7dd3fc; color: #0f172a; box-shadow: 0 2px 5px rgba(125, 211, 252, 0.4);
+      background-color: #bae6fd; color: #94a3b8; box-shadow: 0 2px 5px rgba(186, 230, 253, 0.4);
     }
-    .action-btn:hover { background-color: #38bdf8; color: #ffffff; }
+    .action-btn:hover { background-color: #7dd3fc; color: #64748b; }
 
     .footer-tools { display: flex; align-items: center; justify-content: center; }
     .reset-btn { border: none; background: transparent; color: #94a3b8; font-size: 10px; cursor: pointer; text-decoration: underline; transition: color 0.2s; }
@@ -153,7 +156,7 @@
       </div>
     </div>
 
-    <!-- 물병 그래픽 -->
+    <!-- 물병 그래픽 (눈금 및 용량 숫자 삭제) -->
     <div class="bottle-container" onclick="addWater(500)">
       <svg width="85" height="162" viewBox="0 0 110 210" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -181,12 +184,6 @@
         </g>
         <path d="M27 64 V190" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.75" />
         <path d="M31 60 V194" stroke="#ffffff" stroke-width="1" stroke-linecap="round" opacity="0.35" />
-        <line x1="88" y1="168" x2="94" y2="168" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
-        <text x="97" y="171" font-size="8" font-weight="600" fill="#94a3b8" font-family="Pretendard">500</text>
-        <line x1="88" y1="130" x2="94" y2="130" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
-        <text x="97" y="133" font-size="8" font-weight="600" fill="#94a3b8" font-family="Pretendard">1L</text>
-        <line x1="88" y1="92" x2="94" y2="92" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" />
-        <text x="97" y="95" font-size="8" font-weight="600" fill="#94a3b8" font-family="Pretendard">1.5L</text>
       </svg>
     </div>
 
