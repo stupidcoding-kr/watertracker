@@ -335,6 +335,10 @@
   </div>
 
   <script>
+    // ⚠️ 본인의 실제 Vercel 배포 주소로 수정해주세요 (끝에 / 없이)
+    const VERCEL_DOMAIN = 'https://YOUR-VERCEL-DOMAIN.vercel.app';
+    const API_URL = `${VERCEL_DOMAIN}/api/notion`;
+
     const GOAL_ML = 2000;
     let selectedDate = new Date();
     let viewYear = selectedDate.getFullYear();
@@ -363,7 +367,7 @@
 
     async function loadWaterData(dateStr) {
       try {
-        const res = await fetch(`/api/notion?date=${dateStr}`);
+        const res = await fetch(`${API_URL}?date=${dateStr}`);
         const data = await res.json();
         if (data.success) {
           return data.amount || 0;
@@ -519,6 +523,7 @@
 
       if (shouldSave) {
         saveWaterData(getFormattedDate(selectedDate), currentMl);
+        sendToNotion(getFormattedDate(selectedDate), currentMl);
       }
     }
 
@@ -557,7 +562,7 @@
     /* Notion 전송 함수 */
     async function sendToNotion(dateStr, amount) {
       try {
-        await fetch('/api/notion', {
+        await fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -578,16 +583,13 @@
       const msUntilMidnight = midnight.getTime() - now.getTime();
 
       setTimeout(async () => {
-        // 자정이 되면 지금까지 기록된 물 intake량을 Notion DB에 전송
         await saveToNotionCurrent();
 
-        // 날짜를 오늘(새로운 날)로 업데이트 후 화면 초기화
         selectedDate = new Date();
         viewYear = selectedDate.getFullYear();
         viewMonth = selectedDate.getMonth();
         await loadAndRenderCurrentDate();
 
-        // 다음 자정을 위해 타이머 재설정
         setupMidnightReset();
       }, msUntilMidnight);
     }
