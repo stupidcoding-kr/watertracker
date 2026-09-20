@@ -2,79 +2,157 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Water Tracker - Smart Date Edition</title>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; padding: 10px;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
       font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
       background: transparent;
-      display: flex; justify-content: center; align-items: center; min-height: 100vh;
       user-select: none;
+      overflow: hidden;
     }
     .widget-card {
-      width: 240px; padding: 18px 16px 14px;
-      background: #ffffff; border: 1px solid #f1f5f9; border-radius: 22px;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
-      display: flex; flex-direction: column; align-items: center; text-align: center;
+      width: 100%;
+      height: 100%;
+      padding: 18px 16px 14px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
       position: relative;
+      overflow: hidden;
     }
-    /* Water Tracker 타이틀: 부드러운 검정색(#2b2b2b) 및 자간(letter-spacing) 넓힘 */
-    .title { font-size: 16px; font-weight: 700; color: #2b2b2b; letter-spacing: 2px; margin-bottom: 6px; }
+    
+    /* Water Tracker 타이틀 */
+    .title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2b2b2b;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
     
     /* 날짜 내비게이션 영역 */
     .date-nav {
-      display: flex; align-items: center; justify-content: center; gap: 4px;
-      margin-bottom: 10px; position: relative; width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-bottom: 10px;
+      position: relative;
+      width: 100%;
     }
     .nav-arrow-btn {
-      border: none; background: transparent; color: #94a3b8; font-size: 12px; font-weight: 800;
-      cursor: pointer; padding: 2px 6px; border-radius: 6px; transition: all 0.15s;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: all 0.15s;
     }
     .nav-arrow-btn:hover { background: #f1f5f9; color: #0f172a; }
 
-    /* 날짜 표시 칸: 연한 회색 배경(#f1f5f9) 및 진한 회색 글자(#475569) */
+    /* 날짜 표시 칸 */
     .date-badge {
-      font-size: 11px; font-weight: 600; color: #475569; background-color: #f1f5f9;
-      padding: 3px 10px; border-radius: 16px; display: inline-block; cursor: pointer;
-      border: 1px solid #cbd5e1; transition: all 0.2s;
+      font-size: 11px;
+      font-weight: 600;
+      color: #475569;
+      background-color: #f1f5f9;
+      padding: 3px 10px;
+      border-radius: 16px;
+      display: inline-block;
+      cursor: pointer;
+      border: 1px solid #cbd5e1;
+      transition: all 0.2s;
     }
     .date-badge:hover { background-color: #e2e8f0; }
 
     /* 달력 팝업 */
     .calendar-popup {
       display: none;
-      position: absolute; top: 28px; left: 50%; transform: translateX(-50%);
-      width: 210px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px;
-      padding: 10px 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); z-index: 50;
+      position: absolute;
+      top: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 210px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 10px 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      z-index: 50;
     }
     .calendar-popup.show { display: block; }
 
     .cal-header-nav {
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 0 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding: 0 4px;
     }
     .cal-nav-btn {
-      border: none; background: transparent; color: #64748b; font-size: 11px; font-weight: 800;
-      cursor: pointer; padding: 2px 6px; border-radius: 4px;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
     }
     .cal-nav-btn:hover { background: #f1f5f9; color: #0f172a; }
     .cal-month-title { font-size: 11px; font-weight: 700; color: #1e293b; }
 
     .cal-grid {
-      display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; align-items: center; justify-items: center;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      align-items: center;
+      justify-items: center;
     }
     .cal-day-label {
-      font-size: 9px; color: #94a3b8; font-weight: 600; text-align: center; margin-bottom: 4px; width: 100%;
+      font-size: 9px;
+      color: #94a3b8;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 4px;
+      width: 100%;
     }
     .cal-day-label.sun { color: #ef4444; }
     .cal-day-label.sat { color: #3b82f6; }
 
     .cal-date {
-      width: 100%; aspect-ratio: 1 / 1; font-size: 10px; font-weight: 600; color: #64748b;
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
-      background: transparent; border: none; border-radius: 6px;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      font-size: 10px;
+      font-weight: 600;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
     }
     .cal-date:hover { background-color: #f1f5f9; }
     .cal-date.selected-day { background-color: #0284c7; color: #ffffff; font-weight: 700; }
@@ -83,8 +161,13 @@
     .cal-date.selected-day.sun-day, .cal-date.selected-day.sat-day { color: #ffffff; }
 
     .bottle-container {
-      position: relative; width: 85px; height: 162px; cursor: pointer; margin-bottom: 8px;
+      position: relative;
+      width: 85px;
+      height: 162px;
+      cursor: pointer;
+      margin-bottom: 8px;
       transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex-shrink: 0;
     }
     .bottle-container:hover { transform: scale(1.03); }
     .bottle-container:active { transform: scale(0.97); }
@@ -93,12 +176,24 @@
     .subtitle span.max { color: #94a3b8; font-weight: 500; font-size: 11px; }
 
     .quick-btns { 
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; margin-bottom: 8px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      width: 100%;
+      margin-bottom: 8px;
     }
     .btn {
-      border: none; background-color: #f8fafc; color: #475569; padding: 7px 0;
-      border-radius: 10px; font-size: 11px; font-weight: 600; font-family: inherit;
-      cursor: pointer; transition: all 0.2s ease; border: 1px solid #e2e8f0;
+      border: none;
+      background-color: #f8fafc;
+      color: #475569;
+      padding: 7px 0;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid #e2e8f0;
     }
     .btn:hover { background-color: #f1f5f9; color: #0f172a; border-color: #cbd5e1; }
     .btn-main { background-color: #f0f9ff; color: #0284c7; border-color: #e0f2fe; }
@@ -107,18 +202,34 @@
     .input-box { display: flex; gap: 6px; width: 100%; align-items: center; margin-bottom: 10px; }
     .input-wrapper { position: relative; flex: 1; display: flex; align-items: center; }
     .input-wrapper input {
-      width: 100%; padding: 6px 24px 6px 8px; border: 1px solid #e2e8f0; border-radius: 10px;
-      font-size: 11px; font-family: inherit; text-align: right; outline: none; transition: border-color 0.2s;
-      background-color: #f8fafc; color: #1e293b;
+      width: 100%;
+      padding: 6px 24px 6px 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 11px;
+      font-family: inherit;
+      text-align: right;
+      outline: none;
+      transition: border-color 0.2s;
+      background-color: #f8fafc;
+      color: #1e293b;
     }
     .input-wrapper input:focus { border-color: #7dd3fc; background-color: #ffffff; }
     .input-wrapper .unit { position: absolute; right: 7px; font-size: 10px; font-weight: 600; color: #94a3b8; }
 
-    /* 입력 버튼: 파스텔 연하늘색(#bae6fd) 배경 및 연회색(#94a3b8) 글자 */
     .action-btn {
-      border: none; padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 600;
-      cursor: pointer; transition: all 0.15s ease; font-family: inherit; white-space: nowrap;
-      background-color: #bae6fd; color: #94a3b8; box-shadow: 0 2px 5px rgba(186, 230, 253, 0.4);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+      white-space: nowrap;
+      background-color: #bae6fd;
+      color: #94a3b8;
+      box-shadow: 0 2px 5px rgba(186, 230, 253, 0.4);
     }
     .action-btn:hover { background-color: #7dd3fc; color: #64748b; }
 
@@ -156,7 +267,7 @@
       </div>
     </div>
 
-    <!-- 물병 그래픽 (눈금 및 용량 숫자 삭제) -->
+    <!-- 물병 그래픽 -->
     <div class="bottle-container" onclick="addWater(500)">
       <svg width="85" height="162" viewBox="0 0 110 210" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
