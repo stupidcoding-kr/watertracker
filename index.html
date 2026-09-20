@@ -236,22 +236,10 @@
     .footer-tools {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       width: 100%;
       padding: 0 4px;
     }
-    .save-db-btn {
-      border: none;
-      background-color: #0284c7;
-      color: #ffffff;
-      font-size: 10px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    .save-db-btn:hover { background-color: #0369a1; }
 
     .reset-btn {
       border: none;
@@ -342,7 +330,6 @@
     </div>
 
     <div class="footer-tools">
-      <button class="save-db-btn" onclick="saveToNotionCurrent()">DB 저장</button>
       <button class="reset-btn" onclick="resetWater()">리셋</button>
     </div>
   </div>
@@ -567,15 +554,15 @@
       updateWidget(true);
     }
 
-    /* Notion 전송 함수: Title 속성에 날짜를 바로 기록 */
+    /* Notion 전송 함수 */
     async function sendToNotion(dateStr, amount) {
       try {
         await fetch('/api/notion', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            Title: dateStr, // Title 속성에 날짜 기록 (예: 2026-09-21)
-            Date: dateStr,  // 백엔드 파싱 및 필터링용으로 전달 (필요시 숨김 가능)
+            Title: dateStr,
+            Date: dateStr,
             Amount: amount
           })
         });
@@ -584,11 +571,49 @@
       }
     }
 
+    /* 자정 자동 기록 및 초기화 타이머 설정 */
+    function setupMidnightReset() {
+      const now = new Date();
+      const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+      const msUntilMidnight = midnight.getTime() - now.getTime();
+
+      setTimeout(async () => {
+        // 자정이 되면 지금까지 기록된 물 intake량을 Notion DB에 전송
+        await saveToNotionCurrent();
+
+        // 날짜를 오늘(새로운 날)로 업데이트 후 화면 초기화
+        selectedDate = new Date();
+        viewYear = selectedDate.getFullYear();
+        viewMonth = selectedDate.getMonth();
+        await loadAndRenderCurrentDate();
+
+        // 다음 자정을 위해 타이머 재설정
+        setupMidnightReset();
+      }, msUntilMidnight);
+    }
+
+    /* 백그라운드에서 다시 화면으로 돌아왔을 때 날짜 변경 감지 */
+    let lastCheckedDay = new Date().toDateString();
+    document.addEventListener('visibilitychange', async () => {
+      if (document.visibilityState === 'visible') {
+        const currentToday = new Date().toDateString();
+        if (currentToday !== lastCheckedDay) {
+          await saveToNotionCurrent();
+          selectedDate = new Date();
+          viewYear = selectedDate.getFullYear();
+          viewMonth = selectedDate.getMonth();
+          await loadAndRenderCurrentDate();
+          lastCheckedDay = currentToday;
+        }
+      }
+    });
+
     document.getElementById('customInput').addEventListener('keypress', function (e) {
       if (e.key === 'Enter') handleCustomInput();
     });
 
     loadAndRenderCurrentDate();
+    setupMidnightReset();
   </script>
 </body>
 </html>
