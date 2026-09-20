@@ -7,263 +7,68 @@
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
+      width: 100%; height: 100%; margin: 0; padding: 0;
       font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
-      background: transparent;
-      user-select: none;
-      overflow: hidden;
+      background: transparent; user-select: none; overflow: hidden;
     }
     .widget-card {
-      width: 100%;
-      height: 100%;
-      padding: 18px 16px 14px;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      box-shadow: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+      width: 100%; height: 100%; padding: 18px 16px 14px;
+      background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      position: relative; overflow: hidden;
     }
-    
-    /* Water Tracker 타이틀 */
-    .title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #2b2b2b;
-      letter-spacing: 2px;
-      margin-bottom: 6px;
-    }
-    
-    /* 날짜 내비게이션 영역 */
-    .date-nav {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      margin-bottom: 10px;
-      position: relative;
-      width: 100%;
-    }
-    .nav-arrow-btn {
-      border: none;
-      background: transparent;
-      color: #94a3b8;
-      font-size: 12px;
-      font-weight: 800;
-      cursor: pointer;
-      padding: 2px 6px;
-      border-radius: 6px;
-      transition: all 0.15s;
-    }
+    .title { font-size: 16px; font-weight: 700; color: #2b2b2b; letter-spacing: 2px; margin-bottom: 6px; }
+    .date-nav { display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 10px; position: relative; width: 100%; }
+    .nav-arrow-btn { border: none; background: transparent; color: #94a3b8; font-size: 12px; font-weight: 800; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
     .nav-arrow-btn:hover { background: #f1f5f9; color: #0f172a; }
-
-    /* 날짜 표시 칸 */
-    .date-badge {
-      font-size: 11px;
-      font-weight: 600;
-      color: #475569;
-      background-color: #f1f5f9;
-      padding: 3px 10px;
-      border-radius: 16px;
-      display: inline-block;
-      cursor: pointer;
-      border: 1px solid #cbd5e1;
-      transition: all 0.2s;
-    }
-    .date-badge:hover { background-color: #e2e8f0; }
-
-    /* 달력 팝업 */
-    .calendar-popup {
-      display: none;
-      position: absolute;
-      top: 28px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 210px;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 10px 8px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-      z-index: 50;
-    }
+    .date-badge { font-size: 11px; font-weight: 600; color: #475569; background-color: #f1f5f9; padding: 3px 10px; border-radius: 16px; cursor: pointer; border: 1px solid #cbd5e1; }
+    .calendar-popup { display: none; position: absolute; top: 28px; left: 50%; transform: translateX(-50%); width: 210px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 10px 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); z-index: 50; }
     .calendar-popup.show { display: block; }
-
-    .cal-header-nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      padding: 0 4px;
-    }
-    .cal-nav-btn {
-      border: none;
-      background: transparent;
-      color: #64748b;
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-    .cal-nav-btn:hover { background: #f1f5f9; color: #0f172a; }
+    .cal-header-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 0 4px; }
+    .cal-nav-btn { border: none; background: transparent; color: #64748b; font-size: 11px; font-weight: 800; cursor: pointer; padding: 2px 6px; border-radius: 4px; }
     .cal-month-title { font-size: 11px; font-weight: 700; color: #1e293b; }
-
-    .cal-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 2px;
-      align-items: center;
-      justify-items: center;
-    }
-    .cal-day-label {
-      font-size: 9px;
-      color: #94a3b8;
-      font-weight: 600;
-      text-align: center;
-      margin-bottom: 4px;
-      width: 100%;
-    }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; align-items: center; justify-items: center; }
+    .cal-day-label { font-size: 9px; color: #94a3b8; font-weight: 600; text-align: center; margin-bottom: 4px; width: 100%; }
     .cal-day-label.sun { color: #ef4444; }
     .cal-day-label.sat { color: #3b82f6; }
-
-    .cal-date {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      font-size: 10px;
-      font-weight: 600;
-      color: #64748b;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      background: transparent;
-      border: none;
-      border-radius: 6px;
-    }
+    .cal-date { width: 100%; aspect-ratio: 1 / 1; font-size: 10px; font-weight: 600; color: #64748b; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; border-radius: 6px; }
     .cal-date:hover { background-color: #f1f5f9; }
     .cal-date.selected-day { background-color: #0284c7; color: #ffffff; font-weight: 700; }
     .cal-date.sun-day { color: #ef4444; }
     .cal-date.sat-day { color: #3b82f6; }
-    .cal-date.selected-day.sun-day, .cal-date.selected-day.sat-day { color: #ffffff; }
-
-    .bottle-container {
-      position: relative;
-      width: 85px;
-      height: 162px;
-      cursor: pointer;
-      margin-bottom: 8px;
-      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-      flex-shrink: 0;
-    }
-    .bottle-container:hover { transform: scale(1.03); }
-    .bottle-container:active { transform: scale(0.97); }
-
+    .bottle-container { position: relative; width: 85px; height: 162px; cursor: pointer; margin-bottom: 8px; flex-shrink: 0; }
     .subtitle { font-size: 13px; font-weight: 700; color: #0284c7; margin-bottom: 12px; }
     .subtitle span.max { color: #94a3b8; font-weight: 500; font-size: 11px; }
-
-    .quick-btns { 
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      width: 100%;
-      margin-bottom: 8px;
-    }
-    .btn {
-      border: none;
-      background-color: #f8fafc;
-      color: #475569;
-      padding: 7px 0;
-      border-radius: 10px;
-      font-size: 11px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 1px solid #e2e8f0;
-    }
-    .btn:hover { background-color: #f1f5f9; color: #0f172a; border-color: #cbd5e1; }
+    .quick-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; margin-bottom: 8px; }
+    .btn { border: none; background-color: #f8fafc; color: #475569; padding: 7px 0; border-radius: 10px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; }
     .btn-main { background-color: #f0f9ff; color: #0284c7; border-color: #e0f2fe; }
-    .btn-main:hover { background-color: #e0f2fe; border-color: #bae6fd; }
-
     .input-box { display: flex; gap: 6px; width: 100%; align-items: center; margin-bottom: 10px; }
     .input-wrapper { position: relative; flex: 1; display: flex; align-items: center; }
-    .input-wrapper input {
-      width: 100%;
-      padding: 6px 24px 6px 8px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 11px;
-      font-family: inherit;
-      text-align: right;
-      outline: none;
-      transition: border-color 0.2s;
-      background-color: #f8fafc;
-      color: #1e293b;
-    }
-    .input-wrapper input:focus { border-color: #7dd3fc; background-color: #ffffff; }
+    .input-wrapper input { width: 100%; padding: 6px 24px 6px 8px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 11px; text-align: right; outline: none; background-color: #f8fafc; color: #1e293b; }
     .input-wrapper .unit { position: absolute; right: 7px; font-size: 10px; font-weight: 600; color: #94a3b8; }
-
-    .action-btn {
-      border: none;
-      padding: 6px 12px;
-      border-radius: 10px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      font-family: inherit;
-      white-space: nowrap;
-      background-color: #bae6fd;
-      color: #94a3b8;
-      box-shadow: 0 2px 5px rgba(186, 230, 253, 0.4);
+    .action-btn { border: none; padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 600; cursor: pointer; background-color: #bae6fd; color: #64748b; }
+    .footer-tools { display: flex; align-items: center; justify-content: center; width: 100%; padding: 0 4px; }
+    .reset-btn { border: none; background: transparent; color: #94a3b8; font-size: 10px; cursor: pointer; text-decoration: underline; }
+    
+    /* 디버그 에러 메시지 출력 영역 */
+    #debugBox {
+      width: 100%; font-size: 9px; color: #ef4444; background: #fef2f2;
+      border: 1px solid #fca5a5; border-radius: 6px; padding: 4px;
+      margin-top: 4px; word-break: break-all; display: none;
     }
-    .action-btn:hover { background-color: #7dd3fc; color: #64748b; }
-
-    .footer-tools {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      padding: 0 4px;
-    }
-
-    .reset-btn {
-      border: none;
-      background: transparent;
-      color: #94a3b8;
-      font-size: 10px;
-      cursor: pointer;
-      text-decoration: underline;
-      transition: color 0.2s;
-    }
-    .reset-btn:hover { color: #ef4444; }
   </style>
 </head>
 <body>
   <div class="widget-card">
     <div class="title">Water Tracker</div>
     
-    <!-- 날짜 선택 영역 -->
     <div class="date-nav">
       <button class="nav-arrow-btn" onclick="changeDate(-1)">&lt;</button>
       <div class="date-badge" id="dateDisplay" onclick="toggleCalendarPopup(event)">2026.00.00 (월)</div>
       <button class="nav-arrow-btn" onclick="changeDate(1)">&gt;</button>
 
-      <!-- 팝업 달력 -->
       <div class="calendar-popup" id="calendarPopup" onclick="event.stopPropagation()">
         <div class="cal-header-nav">
           <button class="cal-nav-btn" onclick="changeCalMonth(-1)">&lt;</button>
@@ -282,7 +87,6 @@
       </div>
     </div>
 
-    <!-- 물병 그래픽 -->
     <div class="bottle-container" onclick="addWater(500)">
       <svg width="85" height="162" viewBox="0 0 110 210" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -332,18 +136,26 @@
     <div class="footer-tools">
       <button class="reset-btn" onclick="resetWater()">리셋</button>
     </div>
+
+    <!-- 에러 확인용 영역 -->
+    <div id="debugBox"></div>
   </div>
 
   <script>
-    // ⚠️ 본인의 실제 Vercel 배포 주소로 수정해주세요 (끝에 / 없이)
+    // ⚠️ 아래 주소를 본인의 Vercel 실제 주소로 변경하세요! (마지막에 / 제외)
     const VERCEL_DOMAIN = 'https://YOUR-VERCEL-DOMAIN.vercel.app';
     const API_URL = `${VERCEL_DOMAIN}/api/notion`;
+
+    function showDebugError(msg) {
+      const box = document.getElementById('debugBox');
+      box.style.display = 'block';
+      box.innerText = msg;
+    }
 
     const GOAL_ML = 2000;
     let selectedDate = new Date();
     let viewYear = selectedDate.getFullYear();
     let viewMonth = selectedDate.getMonth();
-
     let currentMl = 0;
     let hasCelebrated = false;
 
@@ -361,21 +173,39 @@
       const y = dateObj.getFullYear();
       const m = String(dateObj.getMonth() + 1).padStart(2, '0');
       const d = String(dateObj.getDate()).padStart(2, '0');
-      const dayName = days[dateObj.getDay()];
-      return `${y}.${m}.${d} (${dayName})`;
+      return `${y}.${m}.${d} (${days[dateObj.getDay()]})`;
     }
 
     async function loadWaterData(dateStr) {
+      if (VERCEL_DOMAIN.includes('YOUR-VERCEL-DOMAIN')) {
+        showDebugError("⚠️ VERCEL_DOMAIN 주소를 수정해 주세요!");
+        return parseInt(localStorage.getItem(`water_tracker_${dateStr}`)) || 0;
+      }
       try {
         const res = await fetch(`${API_URL}?date=${dateStr}`);
         const data = await res.json();
-        if (data.success) {
-          return data.amount || 0;
-        }
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+        return data.amount || 0;
       } catch (e) {
-        console.error("데이터 로드 실패:", e);
+        showDebugError(`로드 오류: ${e.message}`);
       }
       return parseInt(localStorage.getItem(`water_tracker_${dateStr}`)) || 0;
+    }
+
+    async function sendToNotion(dateStr, amount) {
+      if (VERCEL_DOMAIN.includes('YOUR-VERCEL-DOMAIN')) return;
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ Title: dateStr, Date: dateStr, Amount: amount })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+        document.getElementById('debugBox').style.display = 'none';
+      } catch (e) {
+        showDebugError(`저장 오류: ${e.message}`);
+      }
     }
 
     function saveWaterData(dateStr, amount) {
@@ -383,13 +213,11 @@
     }
 
     async function saveToNotionCurrent() {
-      const dateStr = getFormattedDate(selectedDate);
-      await sendToNotion(dateStr, currentMl);
+      await sendToNotion(getFormattedDate(selectedDate), currentMl);
     }
 
     async function changeDate(offset) {
       await saveToNotionCurrent();
-
       selectedDate.setDate(selectedDate.getDate() + offset);
       viewYear = selectedDate.getFullYear();
       viewMonth = selectedDate.getMonth();
@@ -399,10 +227,8 @@
     async function loadAndRenderCurrentDate() {
       const dateStr = getFormattedDate(selectedDate);
       document.getElementById('dateDisplay').innerText = getDisplayDateString(selectedDate);
-
       currentMl = await loadWaterData(dateStr);
       hasCelebrated = currentMl >= GOAL_ML;
-
       updateWidget(false);
       renderCalendar();
     }
@@ -411,9 +237,7 @@
       if (e) e.stopPropagation();
       const popup = document.getElementById('calendarPopup');
       popup.classList.toggle('show');
-      if (popup.classList.contains('show')) {
-        renderCalendar();
-      }
+      if (popup.classList.contains('show')) renderCalendar();
     }
 
     document.addEventListener('click', (e) => {
@@ -425,22 +249,15 @@
 
     function changeCalMonth(delta) {
       viewMonth += delta;
-      if (viewMonth < 0) {
-        viewMonth = 11;
-        viewYear--;
-      } else if (viewMonth > 11) {
-        viewMonth = 0;
-        viewYear++;
-      }
+      if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+      else if (viewMonth > 11) { viewMonth = 0; viewYear++; }
       renderCalendar();
     }
 
     function renderCalendar() {
       const calGrid = document.getElementById('calGrid');
       const calMonthTitle = document.getElementById('calMonthTitle');
-
       calMonthTitle.innerText = `${viewYear}.${String(viewMonth + 1).padStart(2, '0')}`;
-
       const labels = calGrid.querySelectorAll('.cal-day-label');
       calGrid.innerHTML = '';
       labels.forEach(l => calGrid.appendChild(l));
@@ -460,19 +277,14 @@
         const dayOfWeek = (firstDay + d - 1) % 7;
         const dateEl = document.createElement('div');
         dateEl.className = 'cal-date';
-
         const thisDateObj = new Date(viewYear, viewMonth, d);
         const thisDateStr = getFormattedDate(thisDateObj);
 
         if (dayOfWeek === 0) dateEl.classList.add('sun-day');
         if (dayOfWeek === 6) dateEl.classList.add('sat-day');
-
-        if (thisDateStr === selectedStr) {
-          dateEl.classList.add('selected-day');
-        }
+        if (thisDateStr === selectedStr) dateEl.classList.add('selected-day');
 
         dateEl.innerText = d;
-
         dateEl.onclick = async (e) => {
           e.stopPropagation();
           await saveToNotionCurrent();
@@ -480,28 +292,20 @@
           document.getElementById('calendarPopup').classList.remove('show');
           loadAndRenderCurrentDate();
         };
-
         calGrid.appendChild(dateEl);
       }
     }
 
     function triggerConfetti() {
       if (typeof confetti === 'function') {
-        confetti({
-          particleCount: 70,
-          spread: 60,
-          origin: { y: 0.6 },
-          colors: ['#7dd3fc', '#38bdf8', '#0284c7', '#bae6fd', '#fcd34d']
-        });
+        confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 }, colors: ['#7dd3fc', '#38bdf8', '#0284c7', '#bae6fd', '#fcd34d'] });
       }
     }
 
     function updateWidget(shouldSave = true) {
       if (currentMl < 0) currentMl = 0;
-
       if (currentMl >= GOAL_ML && !hasCelebrated) {
-        hasCelebrated = true;
-        triggerConfetti();
+        hasCelebrated = true; triggerConfetti();
       } else if (currentMl < GOAL_ML) {
         hasCelebrated = false;
       }
@@ -515,7 +319,6 @@
 
       const liquid = document.getElementById('liquid');
       const surface = document.getElementById('liquidSurface');
-
       liquid.setAttribute('y', targetY);
       liquid.setAttribute('height', fillHeight);
       surface.setAttribute('cy', targetY);
@@ -527,16 +330,12 @@
       }
     }
 
-    function addWater(amount) {
-      currentMl += amount;
-      updateWidget(true);
-    }
+    function addWater(amount) { currentMl += amount; updateWidget(true); }
 
     function handleCustomInput() {
       const inputEl = document.getElementById('customInput');
       const str = inputEl.value.trim();
       if (!str) return;
-
       if (str.startsWith('+')) {
         const val = parseInt(str.slice(1), 10);
         if (!isNaN(val)) addWater(val);
@@ -545,77 +344,18 @@
         if (!isNaN(val)) addWater(-val);
       } else {
         const val = parseInt(str, 10);
-        if (!isNaN(val) && val >= 0) {
-          currentMl = val;
-          updateWidget(true);
-        }
+        if (!isNaN(val) && val >= 0) { currentMl = val; updateWidget(true); }
       }
       inputEl.value = '';
     }
 
-    function resetWater() {
-      currentMl = 0;
-      hasCelebrated = false;
-      updateWidget(true);
-    }
-
-    /* Notion 전송 함수 */
-    async function sendToNotion(dateStr, amount) {
-      try {
-        await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            Title: dateStr,
-            Date: dateStr,
-            Amount: amount
-          })
-        });
-      } catch (e) {
-        console.error("Notion 저장 실패:", e);
-      }
-    }
-
-    /* 자정 자동 기록 및 초기화 타이머 설정 */
-    function setupMidnightReset() {
-      const now = new Date();
-      const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
-      const msUntilMidnight = midnight.getTime() - now.getTime();
-
-      setTimeout(async () => {
-        await saveToNotionCurrent();
-
-        selectedDate = new Date();
-        viewYear = selectedDate.getFullYear();
-        viewMonth = selectedDate.getMonth();
-        await loadAndRenderCurrentDate();
-
-        setupMidnightReset();
-      }, msUntilMidnight);
-    }
-
-    /* 백그라운드에서 다시 화면으로 돌아왔을 때 날짜 변경 감지 */
-    let lastCheckedDay = new Date().toDateString();
-    document.addEventListener('visibilitychange', async () => {
-      if (document.visibilityState === 'visible') {
-        const currentToday = new Date().toDateString();
-        if (currentToday !== lastCheckedDay) {
-          await saveToNotionCurrent();
-          selectedDate = new Date();
-          viewYear = selectedDate.getFullYear();
-          viewMonth = selectedDate.getMonth();
-          await loadAndRenderCurrentDate();
-          lastCheckedDay = currentToday;
-        }
-      }
-    });
+    function resetWater() { currentMl = 0; hasCelebrated = false; updateWidget(true); }
 
     document.getElementById('customInput').addEventListener('keypress', function (e) {
       if (e.key === 'Enter') handleCustomInput();
     });
 
     loadAndRenderCurrentDate();
-    setupMidnightReset();
   </script>
 </body>
 </html>
