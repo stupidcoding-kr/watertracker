@@ -233,8 +233,35 @@
     }
     .action-btn:hover { background-color: #7dd3fc; color: #64748b; }
 
-    .footer-tools { display: flex; align-items: center; justify-content: center; }
-    .reset-btn { border: none; background: transparent; color: #94a3b8; font-size: 10px; cursor: pointer; text-decoration: underline; transition: color 0.2s; }
+    .footer-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 4px;
+    }
+    .save-db-btn {
+      border: none;
+      background-color: #0284c7;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .save-db-btn:hover { background-color: #0369a1; }
+
+    .reset-btn {
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 10px;
+      cursor: pointer;
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
     .reset-btn:hover { color: #ef4444; }
   </style>
 </head>
@@ -315,6 +342,7 @@
     </div>
 
     <div class="footer-tools">
+      <button class="save-db-btn" onclick="saveToNotionCurrent()">DB 저장</button>
       <button class="reset-btn" onclick="resetWater()">리셋</button>
     </div>
   </div>
@@ -359,12 +387,18 @@
       return parseInt(localStorage.getItem(`water_tracker_${dateStr}`)) || 0;
     }
 
-    async function saveWaterData(dateStr, amount) {
+    function saveWaterData(dateStr, amount) {
       localStorage.setItem(`water_tracker_${dateStr}`, amount);
-      await sendToNotion(dateStr, amount);
     }
 
-    function changeDate(offset) {
+    async function saveToNotionCurrent() {
+      const dateStr = getFormattedDate(selectedDate);
+      await sendToNotion(dateStr, currentMl);
+    }
+
+    async function changeDate(offset) {
+      await saveToNotionCurrent();
+
       selectedDate.setDate(selectedDate.getDate() + offset);
       viewYear = selectedDate.getFullYear();
       viewMonth = selectedDate.getMonth();
@@ -448,8 +482,9 @@
 
         dateEl.innerText = d;
 
-        dateEl.onclick = (e) => {
+        dateEl.onclick = async (e) => {
           e.stopPropagation();
+          await saveToNotionCurrent();
           selectedDate = thisDateObj;
           document.getElementById('calendarPopup').classList.remove('show');
           loadAndRenderCurrentDate();
@@ -532,12 +567,17 @@
       updateWidget(true);
     }
 
+    /* Notion 전송 함수: Title 속성에 날짜를 바로 기록 */
     async function sendToNotion(dateStr, amount) {
       try {
         await fetch('/api/notion', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ date: dateStr, amount: amount })
+          body: JSON.stringify({
+            Title: dateStr, // Title 속성에 날짜 기록 (예: 2026-09-21)
+            Date: dateStr,  // 백엔드 파싱 및 필터링용으로 전달 (필요시 숨김 가능)
+            Amount: amount
+          })
         });
       } catch (e) {
         console.error("Notion 저장 실패:", e);
