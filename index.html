@@ -14,9 +14,9 @@
       background: transparent; user-select: none; overflow: hidden;
     }
 
-    /* 위젯 전체 세로 내부 여백(padding) 여유 있게 확보 */
+    /* 위젯 전체 세로 패딩 확대 */
     .widget-card {
-      width: 100%; height: 100%; padding: 10px 8px 8px 8px;
+      width: 100%; height: 100%; padding: 12px 8px 10px 8px;
       background: #ffffff; border: 1px solid #e6e6e4; border-radius: 14px;
       box-shadow: none;
       display: flex; flex-direction: column; align-items: center; text-align: center;
@@ -25,31 +25,31 @@
     
     .title {
       font-size: 13px; font-weight: 700; color: #37352f;
-      letter-spacing: -0.2px; margin-bottom: 4px;
+      letter-spacing: -0.2px; margin-bottom: 6px;
     }
     
     .date-nav {
       display: flex; align-items: center; justify-content: center;
-      gap: 2px; margin-bottom: 8px; position: relative; width: 100%;
+      gap: 3px; margin-bottom: 10px; position: relative; width: 100%;
     }
     .nav-arrow-btn {
       border: none; background: transparent; color: #787774;
-      font-size: 9.5px; font-weight: 800; cursor: pointer;
-      padding: 1px 4px; border-radius: 3px; transition: background 0.15s;
+      font-size: 10px; font-weight: 800; cursor: pointer;
+      padding: 2px 5px; border-radius: 4px; transition: background 0.15s;
     }
     .nav-arrow-btn:hover { background: #f2f2f0; color: #37352f; }
     
     .date-badge {
-      font-size: 9.5px; font-weight: 600; color: #37352f;
-      background-color: #f2f2f0; padding: 2px 7px; border-radius: 10px;
+      font-size: 10px; font-weight: 600; color: #37352f;
+      background-color: #f2f2f0; padding: 2px 8px; border-radius: 10px;
       cursor: pointer; border: 1px solid #e6e6e4; transition: background 0.15s;
       white-space: nowrap;
     }
     .date-badge:hover { background-color: #e6e6e4; }
     
     .calendar-popup {
-      display: none; position: absolute; top: 24px; left: 50%;
-      transform: translateX(-50%); width: 155px; background: #ffffff;
+      display: none; position: absolute; top: 26px; left: 50%;
+      transform: translateX(-50%); width: 160px; background: #ffffff;
       border: 1px solid #e6e6e4; border-radius: 10px; padding: 6px 4px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); z-index: 50;
     }
@@ -62,52 +62,52 @@
     .cal-day-label { font-size: 8px; color: #9b9a97; font-weight: 600; text-align: center; margin-bottom: 2px; width: 100%; }
     .cal-day-label.sun { color: #eb5757; }
     .cal-day-label.sat { color: #2f80ed; }
-    .cal-date { width: 100%; aspect-ratio: 1 / 1; font-size: 8px; font-weight: 600; color: #5a5a5a; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; border-radius: 3px; }
+    .cal-date { width: 100%; aspect-ratio: 1 / 1; font-size: 8.5px; font-weight: 600; color: #5a5a5a; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; border-radius: 3px; }
     .cal-date:hover { background-color: #f2f2f0; }
     .cal-date.selected-day { background-color: #37352f; color: #ffffff; font-weight: 700; }
     .cal-date.sun-day { color: #eb5757; }
     .cal-date.sat-day { color: #2f80ed; }
 
-    /* 물병 세로 길이를 늘려 시원하게 배치 (height: 72px -> 88px) */
+    /* 물병 아이콘 세로 높이를 시원하게 확장 (height: 120px) */
     .bottle-container {
-      position: relative; width: 44px; height: 88px;
-      cursor: pointer; margin-bottom: 6px; flex-shrink: 0;
+      position: relative; width: 58px; height: 120px;
+      cursor: pointer; margin-bottom: 10px; flex-shrink: 0;
     }
     
     .subtitle {
-      font-size: 11px; font-weight: 700; color: #37352f; margin-bottom: 8px;
+      font-size: 11.5px; font-weight: 700; color: #37352f; margin-bottom: 10px;
     }
-    .subtitle span.max { color: #9b9a97; font-weight: 500; font-size: 9px; }
+    .subtitle span.max { color: #9b9a97; font-weight: 500; font-size: 9.5px; }
     
-    /* 빠른 버튼 및 입력창 세로 여백 확충 */
-    .quick-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 100%; margin-bottom: 6px; }
+    /* 세로 버튼 영역 및 입력창 높이 확대 */
+    .quick-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 100%; margin-bottom: 8px; }
     .btn {
       border: none; background-color: #fbfbf9; color: #37352f;
-      padding: 4.5px 0; border-radius: 5px; font-size: 9px; font-weight: 600;
+      padding: 5.5px 0; border-radius: 5px; font-size: 9.5px; font-weight: 600;
       cursor: pointer; border: 1px solid #e6e6e4; transition: background 0.15s;
     }
     .btn:hover { background-color: #f2f2f0; }
     .btn-main { background-color: #f2f2f0; color: #37352f; border-color: #d3d3d0; font-weight: 700; }
     
-    .input-box { display: flex; gap: 4px; width: 100%; align-items: center; margin-bottom: 6px; }
+    .input-box { display: flex; gap: 4px; width: 100%; align-items: center; margin-bottom: 8px; }
     .input-wrapper { position: relative; flex: 1; display: flex; align-items: center; }
     .input-wrapper input {
-      width: 100%; padding: 4px 16px 4px 6px; border: 1px solid #e6e6e4;
-      border-radius: 5px; font-size: 9px; text-align: right; outline: none;
+      width: 100%; padding: 5px 18px 5px 6px; border: 1px solid #e6e6e4;
+      border-radius: 5px; font-size: 9.5px; text-align: right; outline: none;
       background-color: #fbfbf9; color: #37352f; font-family: inherit;
     }
     .input-wrapper input:focus { border-color: #d3d3d0; background-color: #ffffff; }
-    .input-wrapper .unit { position: absolute; right: 4px; font-size: 8px; font-weight: 600; color: #9b9a97; }
+    .input-wrapper .unit { position: absolute; right: 4px; font-size: 8.5px; font-weight: 600; color: #9b9a97; }
     
     .action-btn {
-      border: none; padding: 4px 7px; border-radius: 5px; font-size: 9px;
+      border: none; padding: 5px 8px; border-radius: 5px; font-size: 9.5px;
       font-weight: 600; cursor: pointer; background-color: #787774; color: #ffffff;
       transition: background 0.15s; white-space: nowrap;
     }
     .action-btn:hover { background-color: #5a5a5a; }
     
     .footer-tools { display: flex; align-items: center; justify-content: center; width: 100%; margin-top: 2px; }
-    .reset-btn { border: none; background: transparent; color: #9b9a97; font-size: 8.5px; cursor: pointer; text-decoration: underline; }
+    .reset-btn { border: none; background: transparent; color: #9b9a97; font-size: 9px; cursor: pointer; text-decoration: underline; }
     .reset-btn:hover { color: #37352f; }
     
     #debugBox {
